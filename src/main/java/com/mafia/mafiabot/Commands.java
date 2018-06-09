@@ -164,11 +164,11 @@ public class Commands {
         if(!e.getMessage().getAuthor().canManageRolesOnServer()) throw new RoleNotHighEnoughException();
         List<User> players = new LinkedList<>();
         Message m = e.getChannel().sendMessage("New game started by " + e.getMessage().getAuthor().getName()+". React to join.").getNow(null);
-        m.addReaction(":heavy_check_mark:");
+
         new Thread(
             () -> {
                 m.addReactionAddListener(x -> {if(x.getEmoji().equalsEmoji(":heavy_check_mark:")) players.add(x.getUser());});
-                m.addReactionRemoveListener(x -> {if(x.getEmoji().equalsEmoji(":heavy_check_mark:")) players.add(x.getUser());});
+                m.addReactionRemoveListener(x -> {if(x.getEmoji().equalsEmoji(":heavy_check_mark:")) players.remove(x.getUser());});
                 try {
                     Thread.sleep(120000);
                 } catch (InterruptedException ex) {

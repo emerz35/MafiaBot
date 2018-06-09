@@ -3,10 +3,11 @@ package com.mafia.mafiabot;
 import java.util.Random;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
+import java.util.Scanner;
 
 
 public class Main {
-    private static final String token = "NDU0NDA2NzMzNzE3MTc2MzI0.Dfs-yA._ZTeOX49xTLnQIv4CfXc1YSvdwU";
+    static String token;
     public static final Random r = new Random();
     /**
      * The main bot class to run, adds message create listeners
@@ -14,7 +15,9 @@ public class Main {
      * @param args The arguments for the program.
      */
     public static void main(String[] args) {
-
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter Token:");
+        token = scanner.nextLine();
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
 
         System.out.println("You can invite me by using the following url: " + api.createBotInvite());
