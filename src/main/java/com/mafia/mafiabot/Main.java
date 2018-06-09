@@ -5,15 +5,15 @@ import org.javacord.api.DiscordApiBuilder;
 
 
 public class Main {
-
+    private static String token = "NDU0NDA2NzMzNzE3MTc2MzI0.Dfs-yA._ZTeOX49xTLnQIv4CfXc1YSvdwU";
     /**
-     * The entrance point of our program.
+     * The main bot class to run, adds message create listeners
      *
-     * @param args The arguments for the program. The first element should be the bot's token.
+     * @param args The arguments for the program.
      */
     public static void main(String[] args) {
 
-        DiscordApi api = new DiscordApiBuilder().setToken("NDU0NDA2NzMzNzE3MTc2MzI0.Dfs-yA._ZTeOX49xTLnQIv4CfXc1YSvdwU").login().join();
+        DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
 
         System.out.println("You can invite me by using the following url: " + api.createBotInvite());
         

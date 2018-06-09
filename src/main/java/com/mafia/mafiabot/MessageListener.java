@@ -4,11 +4,14 @@ import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 
 /**
- *
+ *Listens for a new message.
  * @author Charlie Hands
  */
 public class MessageListener implements MessageCreateListener{
-
+    /**
+     * Runs when a message is created and checks for the different commands.
+     * @param e The message event
+     */
     @Override
     public void onMessageCreate(MessageCreateEvent e) {
        String message = e.getMessage().getContent();
