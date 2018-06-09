@@ -57,10 +57,9 @@ public class MessageListener implements MessageCreateListener{
                  + "\n!endnight - Ends the night. Everyone is unmuted."
                  + "\n!endgame - Removes game roles.");
              }    
-       }catch(RoleNotHighEnoughException ex){
+       }catch(RoleNotHighEnoughException | NotInGameException ex){
            e.getChannel().sendMessage(ex.getMessage());
-       }catch(NotInGameException ex){
-           e.getChannel().sendMessage("This player is not it the game.");
+       
        }
     } 
 }
