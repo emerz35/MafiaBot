@@ -1,11 +1,13 @@
 package com.mafia.mafiabot;
 
+import java.util.Random;
 import org.javacord.api.DiscordApi;
 import org.javacord.api.DiscordApiBuilder;
 
 
 public class Main {
-    private static String token = "NDU0NDA2NzMzNzE3MTc2MzI0.Dfs-yA._ZTeOX49xTLnQIv4CfXc1YSvdwU";
+    private static final String token = "NDU0NDA2NzMzNzE3MTc2MzI0.Dfs-yA._ZTeOX49xTLnQIv4CfXc1YSvdwU";
+    public static final Random r = new Random();
     /**
      * The main bot class to run, adds message create listeners
      *

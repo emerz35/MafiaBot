@@ -1,15 +1,21 @@
 package com.mafia.mafiabot;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.permission.PermissionState;
 import org.javacord.api.entity.permission.PermissionType;
 import org.javacord.api.entity.permission.PermissionsBuilder;
 import org.javacord.api.entity.server.ServerUpdater;
 import org.javacord.api.entity.user.User;
 import org.javacord.api.event.message.MessageCreateEvent;
+import org.javacord.api.listener.message.reaction.ReactionAddListener;
+import org.javacord.api.listener.message.reaction.ReactionRemoveListener;
 
 /**
  *The commands for the bot, also contains lists for roles in the game.
@@ -40,7 +46,7 @@ public class Commands {
                 villagers.remove(user);
                 e.getChannel().sendMessage(user.getName() + " was killed!");
             }
-            else e.getChannel().sendMessage(user.getName() + " was saved by the doctor before death.");
+            else e.getChannel().sendMessage(user.getName() + " was saved by a doctor before death.");
             saved.clear();
         }
         else e.getChannel().sendMessage("The doctors haven't all chosen to save someone yet. Please try again later.");
@@ -131,7 +137,7 @@ public class Commands {
         locked = false;
     }
     /**
-     * Ends the game by removing everyone in the game from 
+     * Ends the game by removing everyone in the game from their roles and the role lists.
      * @param e The message event to get the server.
      * @throws RoleNotHighEnoughException if the author can't manage roles on the server.
      */
@@ -148,5 +154,46 @@ public class Commands {
         villagers.clear();
         dead.clear();
         saved.clear();
+    }
+    /**
+     * Starts the game by sending a message for people to react to within 2 minutes, then decides the number of people to assign to each role.
+     * @param e The message event to get the server.
+     * @throws RoleNotHighEnoughException if the author can't manage roles on the server.
+     */
+    public static void startGame(MessageCreateEvent e) throws RoleNotHighEnoughException{
+        if(!e.getMessage().getAuthor().canManageRolesOnServer()) throw new RoleNotHighEnoughException();
+        List<User> players = new LinkedList<>();
+        Message m = e.getChannel().sendMessage("New game started by " + e.getMessage().getAuthor().getName()+". React to join.").getNow(null);
+        m.addReaction(":heavy_check_mark:");
+        new Thread(
+            () -> {
+                m.addReactionAddListener(x -> {if(x.getEmoji().equalsEmoji(":heavy_check_mark:")) players.add(x.getUser());});
+                m.addReactionRemoveListener(x -> {if(x.getEmoji().equalsEmoji(":heavy_check_mark:")) players.add(x.getUser());});
+                try {
+                    Thread.sleep(120000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                m.getReactionAddListeners().forEach(x -> m.removeListener(ReactionAddListener.class, x));
+                m.getReactionRemoveListeners().forEach(x->m.removeListener(ReactionRemoveListener.class, x));
+                if(players.size() < 5) e.getChannel().sendMessage("Not enough people to start game. Please try again.");
+                else{
+                    players.stream().forEach(x -> {
+                        players.remove(x);
+                        players.add(Main.r.nextInt(players.size()), x);
+                    });
+                    try {
+                        addMafia(e,players.subList(0, (int)Math.ceil((double)players.size()/5.0)));
+                        addDoctors(e,players.subList((int)Math.ceil((double)players.size()/5.0),(int)Math.ceil((double)(players.size())/10.0)));
+                        addDetectives(e,players.subList((int)Math.ceil((double)(players.size())/10.0),(int)Math.ceil((double)(players.size())/10.0)));
+                        addVillagers(e,players.subList((int)Math.ceil((double)(players.size())/10.0),players.size()));
+                    } catch (RoleNotHighEnoughException ex) {
+                        Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    e.getChannel().sendMessage("The game has started. Please join voice chat.");
+                }
+            }
+        ).start();
+        
     }
 }
