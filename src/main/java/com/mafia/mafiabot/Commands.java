@@ -1,12 +1,14 @@
 package com.mafia.mafiabot;
 
-import java.util.Arrays;
+import com.vdurmont.emoji.EmojiParser;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.permission.PermissionState;
 import org.javacord.api.entity.permission.PermissionType;
@@ -161,39 +163,47 @@ public class Commands {
      * @throws RoleNotHighEnoughException if the author can't manage roles on the server.
      */
     public static void startGame(MessageCreateEvent e) throws RoleNotHighEnoughException{
-        if(!e.getMessage().getAuthor().canManageRolesOnServer()) throw new RoleNotHighEnoughException();
-        List<User> players = new LinkedList<>();
-        Message m = e.getChannel().sendMessage("New game started by " + e.getMessage().getAuthor().getName()+". React to join.").getNow(null);
-        m.addReaction("heavy_check_mark");
-        new Thread(
-            () -> {
-                m.addReactionAddListener(x -> {if(x.getEmoji().equalsEmoji("heavy_check_mark")) players.add(x.getUser());});
-                m.addReactionRemoveListener(x -> {if(x.getEmoji().equalsEmoji("heavy_check_mark")) players.remove(x.getUser());});
-                try {
-                    Thread.sleep(120000);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                m.getReactionAddListeners().forEach(x -> m.removeListener(ReactionAddListener.class, x));
-                m.getReactionRemoveListeners().forEach(x->m.removeListener(ReactionRemoveListener.class, x));
-                if(players.size() < 5) e.getChannel().sendMessage("Not enough people to start game. Please try again.");
-                else{
-                    players.stream().forEach(x -> {
-                        players.remove(x);
-                        players.add(Main.r.nextInt(players.size()), x);
-                    });
-                    try {
-                        addMafia(e,players.subList(0, (int)Math.ceil((double)players.size()/5.0)));
-                        addDoctors(e,players.subList((int)Math.ceil((double)players.size()/5.0),(int)Math.ceil((double)(players.size())/10.0)));
-                        addDetectives(e,players.subList((int)Math.ceil((double)(players.size())/10.0),(int)Math.ceil((double)(players.size())/10.0)));
-                        addVillagers(e,players.subList((int)Math.ceil((double)(players.size())/10.0),players.size()));
-                    } catch (RoleNotHighEnoughException ex) {
-                        Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+        try {
+            if(!e.getMessage().getAuthor().canManageRolesOnServer()) throw new RoleNotHighEnoughException();
+            List<User> players = new LinkedList<>();
+            Message m = e.getChannel().sendMessage("@here\nNew game started by " + e.getMessage().getAuthor().getName()+". React to join.").get();
+            m.addReaction(EmojiParser.parseToUnicode(":white_check_mark:"));
+            new Thread(
+                    () -> {
+                        System.out.println("Thread running.");
+                        m.addReactionAddListener(x -> {if(x.getEmoji().equalsEmoji(EmojiParser.parseToUnicode(":white_check_mark:"))) players.add(x.getUser());});
+                        m.addReactionRemoveListener(x -> {if(x.getEmoji().equalsEmoji(EmojiParser.parseToUnicode(":white_check_mark:"))) players.remove(x.getUser());});
+                        try {
+                            Thread.sleep(120000);
+                        } catch (InterruptedException ex) {
+                            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        players.remove(e.getApi().getYourself());
+                        players.forEach((user) -> {
+                            e.getChannel().sendMessage(user.getName());
+                        });
+                        m.getReactionAddListeners().forEach(x -> m.removeListener(ReactionAddListener.class, x));
+                        m.getReactionRemoveListeners().forEach(x->m.removeListener(ReactionRemoveListener.class, x));
+                        if(players.size() < 5) e.getChannel().sendMessage("Not enough people to start game. Please try again.");
+                        else{
+                            players.stream().forEach(x -> {
+                                players.remove(x);
+                                players.add(Main.r.nextInt(players.size()), x);
+                            });
+                            try {
+                                addMafia(e,players.subList(0, (int)Math.ceil((double)players.size()/5.0)));
+                                addDoctors(e,players.subList((int)Math.ceil((double)players.size()/5.0),(int)Math.ceil((double)(players.size())/10.0)));
+                                addDetectives(e,players.subList((int)Math.ceil((double)(players.size())/10.0),(int)Math.ceil((double)(players.size())/10.0)));
+                                addVillagers(e,players.subList((int)Math.ceil((double)(players.size())/10.0),players.size()));
+                            } catch (RoleNotHighEnoughException ex) {
+                                Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            e.getChannel().sendMessage("The game has started. Please join voice chat.");
+                        }
                     }
-                    e.getChannel().sendMessage("The game has started. Please join voice chat.");
-                }
-            }
-        ).start();
-        
+            ).start();
+        } catch (InterruptedException | ExecutionException ex) {
+            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

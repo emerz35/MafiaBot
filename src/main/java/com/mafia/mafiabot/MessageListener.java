@@ -62,7 +62,7 @@ public class MessageListener implements MessageCreateListener{
                 break;
             case "!startgame":Commands.startGame(e);
                 break;
-        }    
+            }    
        }catch(RoleNotHighEnoughException | NotInGameException ex){
            e.getChannel().sendMessage(ex.getMessage());
        
