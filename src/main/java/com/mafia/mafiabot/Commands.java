@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.javacord.api.entity.emoji.Emoji;
 import org.javacord.api.entity.message.Message;
 import org.javacord.api.entity.permission.PermissionState;
 import org.javacord.api.entity.permission.PermissionType;
@@ -35,8 +34,12 @@ public class Commands {
      *Kills a person by setting their role to dead, removing any other Active Player role they have and removing them from the role lists.
      *@param user The user to kill.
      *@param e The message event to get the channel to reply and to get the server for roles.
+     * @throws com.mafia.mafiabot.RoleNotHighEnoughException
+     * @throws com.mafia.mafiabot.NotInGameException
      */
-    public static void kill(User user, MessageCreateEvent e){
+    public static void kill(User user, MessageCreateEvent e) throws RoleNotHighEnoughException, NotInGameException{
+        if(!e.getMessage().getAuthor().canManageRolesOnServer()) throw new RoleNotHighEnoughException();
+        String role = inspect(user);
         if(!locked){
             if(!saved.contains(user)){
                 dead.add(user);
@@ -46,13 +49,64 @@ public class Commands {
                 mafia.remove(user);
                 detectives.remove(user);
                 villagers.remove(user);
-                e.getChannel().sendMessage(user.getName() + " was killed!");
+                e.getChannel().sendMessage(user.getName() + " was killed! They were a " + role);
             }
             else e.getChannel().sendMessage(user.getName() + " was saved by a doctor before death.");
             saved.clear();
         }
         else e.getChannel().sendMessage("The doctors haven't all chosen to save someone yet. Please try again later.");
     }
+    /**
+     * Accuses the user and starts a vote whether to kill them or not
+     * @param user The user accused.
+     * @param e The message event to get the author and the channel.
+     * @throws RoleNotHighEnoughException
+     * @throws NotInGameException 
+     */
+    public static void accuse(User user, MessageCreateEvent e) throws RoleNotHighEnoughException, NotInGameException{
+        if(!e.getMessage().getAuthor().canManageRolesOnServer()) throw new RoleNotHighEnoughException();
+        inspect(user);
+        try {
+            Message m = e.getChannel().sendMessage(user.getName() + " has been accused. Are they guilty? React :white_check_mark: for yes and :x: for no.").get();
+            m.addReaction(EmojiParser.parseToUnicode(":white_check_mark:"));
+            m.addReaction(EmojiParser.parseToUnicode(":x:"));
+            new Thread(
+                () -> {
+                    final List<User> playersfor = new LinkedList<>();
+                    final List<User> playersagainst = new LinkedList<>();
+                    m.addReactionAddListener(x -> {
+                        if(x.getEmoji().equalsEmoji(EmojiParser.parseToUnicode(":white_check_mark:"))) playersfor.add(x.getUser());
+                        else if(x.getEmoji().equalsEmoji(EmojiParser.parseToUnicode(":x:"))) playersagainst.add(x.getUser());
+                    
+                    });
+                    m.addReactionRemoveListener(x -> {
+                        if(x.getEmoji().equalsEmoji(EmojiParser.parseToUnicode(":white_check_mark:"))) playersfor.remove(x.getUser());
+                        else if(x.getEmoji().equalsEmoji(EmojiParser.parseToUnicode(":x:"))) playersagainst.remove(x.getUser());
+                    });
+                    try {
+                        Thread.sleep(60000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    m.getReactionAddListeners().forEach(x -> m.removeListener(ReactionAddListener.class, x));
+                    m.getReactionRemoveListeners().forEach(x->m.removeListener(ReactionRemoveListener.class, x));
+                    
+                    try {
+                        if(playersfor.size() >= playersagainst.size()) {
+                            kill(user,e);
+                        }
+                        else e.getChannel().sendMessage("There are not enough votes against " + user.getName()+ ". They have been spared.");
+                    } catch (RoleNotHighEnoughException | NotInGameException ex) {
+                        Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } 
+            ).start();
+        } catch (InterruptedException | ExecutionException ex) {
+            Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
     /**
      * Saves a user so they can't be killed and allows a person to be killed if all the doctors have save someone.
      * @param user The user to save.
@@ -137,6 +191,7 @@ public class Commands {
         if(!e.getMessage().getAuthor().canManageRolesOnServer()) throw new RoleNotHighEnoughException();
         e.getServer().get().getRoles().forEach(x->x.updatePermissions(new PermissionsBuilder(x.getPermissions()).setState(PermissionType.VOICE_SPEAK,PermissionState.ALLOWED).build()));
         locked = false;
+        saved.clear();
     }
     /**
      * Ends the game by removing everyone in the game from their roles and the role lists.

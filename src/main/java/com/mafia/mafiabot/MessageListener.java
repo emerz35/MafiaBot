@@ -16,6 +16,7 @@ public class MessageListener implements MessageCreateListener{
     public void onMessageCreate(MessageCreateEvent e) {
        String message = e.getMessage().getContent();
        try{
+        if(!e.getMessage().getAuthor().isYourself())
         switch(message.split(" ")[0].toLowerCase()){
             case "!kill": 
                 if(e.getMessage().getMentionedUsers().contains(e.getApi().getYourself())) e.getChannel().sendMessage("Aarrrgh!\n*Dies*");
@@ -49,7 +50,8 @@ public class MessageListener implements MessageCreateListener{
                 Commands.endGame(e);
                 break;
             case "!help": e.getChannel().sendMessage(
-                    "Commands:\n!kill @name - Kill someone."
+                "Commands:\n!kill @name - Kill someone."
+                + "\n!accuse @name - Accuses someone and starts a vote to see if they will die or not."
                 + "\n!save @name - Save someone."
                 + "\n!inspect @name - Inspect someone. Says if they are mafia, villager, doctor or detective."
                 + "\n!mafia @names - Adds mafia to the game."
@@ -58,9 +60,18 @@ public class MessageListener implements MessageCreateListener{
                 + "\n!detectives @names - Adds detectives to the game."
                 + "\n!startnight - Starts the night. Everyone is muted in voicechat (hopefully)."
                 + "\n!endnight - Ends the night. Everyone is unmuted."
+                + "\n!startgame - Sends a message for people to join a game. React to join."
                 + "\n!endgame - Removes game roles.");
                 break;
             case "!startgame":Commands.startGame(e);
+                break;
+            case "!accuse": Commands.accuse(e.getMessage().getMentionedUsers().get(0), e);
+                break;
+            case "!creator": e.getChannel().sendMessage("I was made by FlyingLongSword-sama");
+                break;
+            case "!gettoken": e.getChannel().sendMessage("No");
+                break;
+            case "!java": e.getChannel().sendMessage("I was made in Java with the Javacord library.");
                 break;
             }    
        }catch(RoleNotHighEnoughException | NotInGameException ex){

@@ -6,7 +6,7 @@ package com.mafia.mafiabot;
  */
 public class NotInGameException extends Exception{
     public NotInGameException(){
-        super("this player is not in the game.");
+        super("This player is not in the game or is dead.");
     }
     public NotInGameException(String message){
         super(message);
