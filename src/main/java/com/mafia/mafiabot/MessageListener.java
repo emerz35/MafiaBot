@@ -23,10 +23,10 @@ public class MessageListener implements MessageCreateListener{
                 Commands.kill(e.getMessage().getMentionedUsers().get(0), e);
                 break;
             case "!save": 
-                Commands.save(e.getMessage().getMentionedUsers().get(0));
+                Commands.save(e.getMessage().getMentionedUsers().get(0),e.getServer().get());
                 break;
             case "!inspect":
-                e.getChannel().sendMessage(e.getMessage().getAuthor().getDisplayName() + " is a " + Commands.inspect(e.getMessage().getMentionedUsers().get(0)));
+                e.getChannel().sendMessage(e.getMessage().getAuthor().getDisplayName() + " is a " + Commands.inspect(e.getMessage().getMentionedUsers().get(0),e.getServer().get()));
                 break;
             case "!mafia":
                 Commands.addMafia(e, e.getMessage().getMentionedUsers());
@@ -73,8 +73,10 @@ public class MessageListener implements MessageCreateListener{
                 break;
             case "!java": e.getChannel().sendMessage("I was made in Java with the Javacord library.");
                 break;
+            case "!test": Commands.test(e);
+                break;
             }    
-       }catch(RoleNotHighEnoughException | NotInGameException ex){
+       }catch(RoleNotHighEnoughException | NotInGameException | GameDoesntExistException ex){
            e.getChannel().sendMessage(ex.getMessage());
        
        }
