@@ -34,6 +34,11 @@
     </dependencies>
     <build>
         <plugins>
+           <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>fabric8-maven-plugin</artifactId>
+            <version>3.5.39</version>
+          </plugin>
           <plugin>
             <!-- Build an executable JAR -->
             <groupId>org.apache.maven.plugins</groupId>

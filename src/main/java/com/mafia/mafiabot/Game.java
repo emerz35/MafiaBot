@@ -16,9 +16,11 @@ public class Game {
     
     //If anyone can be killed. Is set to true at startnight if there are doctors left alive.
     public boolean locked = false;
+    public User mod;
     Server server;
-    public Game(Server server){
+    public Game(Server server, User mod){
         this.server = server;
+        this.mod = mod;
     }
     public Server getServer(){
         return server;

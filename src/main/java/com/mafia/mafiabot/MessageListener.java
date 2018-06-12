@@ -73,9 +73,9 @@ public class MessageListener implements MessageCreateListener{
                 break;
             case "!java": e.getChannel().sendMessage("I was made in Java with the Javacord library.");
                 break;
-            case "!test": Commands.test(e);
-                break;
-            }    
+            /*case "!test": Commands.test(e);
+                break;*/
+            }   
        }catch(RoleNotHighEnoughException | NotInGameException | GameDoesntExistException ex){
            e.getChannel().sendMessage(ex.getMessage());
        
