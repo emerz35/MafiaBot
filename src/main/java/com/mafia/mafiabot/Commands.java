@@ -243,7 +243,7 @@ public class Commands {
             List<User> players = new LinkedList<>();
             Message m = e.getChannel().sendMessage("@here\nNew game started by " + e.getMessage().getAuthor().getName()+". React to join.").get();
             m.addReaction(EmojiParser.parseToUnicode(":white_check_mark:"));
-            games.add(new Game(e.getServer().get(),e.getMessage().getUserAuthor().get()));
+            
             e.getServer().get().getRolesByNameIgnoreCase("active moderator").forEach(x -> e.getMessage().getUserAuthor().get().addRole(x));
             e.getServer().get().getRolesByNameIgnoreCase("trained moderator").forEach(x -> e.getMessage().getUserAuthor().get().removeRole(x));
             new Thread(
@@ -276,6 +276,11 @@ public class Commands {
                                 Logger.getLogger(Commands.class.getName()).log(Level.SEVERE, null, ex);
                             }
                             e.getChannel().sendMessage("The game has started. Please join voice chat.");
+                            games.add(new Game(e.getServer().get(),e.getMessage().getUserAuthor().get()));
+                            /*players().forEach(x -> {
+                            if(x.getRoles(e.getServer().get()).contains(e.getServer().get().getRolesByNameIgnoreCase("Mafia Elite (admin)")))x.removeRole(e.getServer().get().getRolesByNameIgnoreCase("Mafia Elite ()"));
+                            
+                            });*/
                         }
                     }
             ).start();
