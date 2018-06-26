@@ -17,7 +17,7 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter Token:");
-        token = scanner.nextLine();
+        token = System.getenv("token");
         DiscordApi api = new DiscordApiBuilder().setToken(token).login().join();
 
         System.out.println("You can invite me by using the following url: " + api.createBotInvite());
