@@ -16,13 +16,16 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repository>
+            <id>javacord</id>
+            <url>https://github.com/Javacord/Javacord/tree/v_3</url>
+        </repository>
     </repositories>
     
     <dependencies>
         <dependency>
             <groupId>de.btobastian.Javacord</groupId>
             <artifactId>javacord</artifactId>
-            <!-- See below what to insert here -->
             <version>22c8c32</version>
             <type>pom</type>
         </dependency>
@@ -45,7 +48,6 @@
             <version>3.5.39</version>
           </plugin>
           <plugin>
-            <!-- Build an executable JAR -->
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-jar-plugin</artifactId>
             <version>3.1.0</version>
