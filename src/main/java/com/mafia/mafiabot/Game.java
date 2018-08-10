@@ -48,14 +48,15 @@ public class Game {
      * @throws NotInGameException
      * @throws com.mafia.mafiabot.GameDoesntExistException
      */
-    public  void kill(User user, MessageCreateEvent e) throws RoleNotHighEnoughException, NotInGameException, GameDoesntExistException{
-        if(e.getServer().get().getHighestRoleOf(e.getMessage().getUserAuthor().get()).get().getPosition() < e.getServer().get().getRolesByNameIgnoreCase("active moderator").get(0).getPosition()) throw new RoleNotHighEnoughException("You have to be the active moderator or higher to run this command.");
+    public void kill(User user, MessageCreateEvent e) throws RoleNotHighEnoughException, NotInGameException, GameDoesntExistException{
+        //if(e.getServer().get().getHighestRoleOf(e.getMessage().getUserAuthor().get()).get().getPosition() < e.getServer().get().getRolesByNameIgnoreCase("active moderator").get(0).getPosition()) throw new RoleNotHighEnoughException("You have to be the active moderator or higher to run this command.");
+        if(!e.getMessage().getUserAuthor().get().getRoles(server).contains(server.getRolesByNameIgnoreCase("active moderator").get(0)))throw new RoleNotHighEnoughException("You have to be the active moderator run this command.");
         inspect(user,e.getServer().get());
         if(!locked){
             if(!saved.contains(user)){
                 dead.add(user);
-                CompletableFuture<Void> update = new ServerUpdater(getServer()).removeAllRolesFromUser(user,getServer().getRoles().stream().filter(y -> y.getName().startsWith("Active Player")).collect(Collectors.toList()))
-                        .addAllRolesToUser(user,getServer().getRolesByNameIgnoreCase("Dead")).update();
+                CompletableFuture<Void> update = new ServerUpdater(getServer()).removeRolesFromUser(user,getServer().getRoles().stream().filter(y -> y.getName().startsWith("Active Player")).collect(Collectors.toList()))
+                        .addRolesToUser(user,getServer().getRolesByNameIgnoreCase("Dead")).update();
                 doctors.remove(user);
                 mafia.remove(user);
                 detectives.remove(user);
@@ -76,7 +77,7 @@ public class Game {
      * @throws com.mafia.mafiabot.GameDoesntExistException 
      */
     public void accuse(User user, MessageCreateEvent e) throws RoleNotHighEnoughException, NotInGameException, GameDoesntExistException{
-        if(getServer().getHighestRoleOf(e.getMessage().getUserAuthor().get()).get().getPosition() < e.getServer().get().getRolesByNameIgnoreCase("active moderator").get(0).getPosition()) throw new RoleNotHighEnoughException("You have to be the active moderator or higher to run this command.");
+        if(!e.getMessage().getUserAuthor().get().getRoles(server).contains(server.getRolesByNameIgnoreCase("active moderator").get(0)))throw new RoleNotHighEnoughException("You have to be the active moderator run this command.");
         inspect(user,e.getServer().get());
         try {
             Message m = e.getChannel().sendMessage(user.getName() + " has been accused. Are they guilty? React :white_check_mark: for yes and :x: for no.").get();
@@ -152,7 +153,7 @@ public class Game {
      * @throws com.mafia.mafiabot.GameDoesntExistException
      */
     public void addMafia(MessageCreateEvent e,List<User>users) throws RoleNotHighEnoughException, GameDoesntExistException{
-        if(e.getServer().get().getHighestRoleOf(e.getMessage().getUserAuthor().get()).get().getPosition() < e.getServer().get().getRolesByNameIgnoreCase("active moderator").get(0).getPosition()) throw new RoleNotHighEnoughException("You have to be the active moderator or higher to run this command.");
+        if(!e.getMessage().getUserAuthor().get().getRoles(server).contains(server.getRolesByNameIgnoreCase("active moderator").get(0)))throw new RoleNotHighEnoughException("You have to be the active moderator run this command.");
         mafia.addAll(users);
         users.forEach(x -> getServer().getRolesByNameIgnoreCase("Active Player iill").get(0).addUser(x));
     }
@@ -164,7 +165,7 @@ public class Game {
      * @throws com.mafia.mafiabot.GameDoesntExistException
      */
     public void addDoctors(MessageCreateEvent e,List<User>users)throws RoleNotHighEnoughException, GameDoesntExistException{
-        if(getServer().getHighestRoleOf(e.getMessage().getUserAuthor().get()).get().getPosition() < getServer().getRolesByNameIgnoreCase("active moderator").get(0).getPosition()) throw new RoleNotHighEnoughException("You have to be the active moderator or higher to run this command.");
+        if(!e.getMessage().getUserAuthor().get().getRoles(server).contains(server.getRolesByNameIgnoreCase("active moderator").get(0)))throw new RoleNotHighEnoughException("You have to be the active moderator run this command.");
         doctors.addAll(users);
         users.forEach(x -> e.getServer().get().getRolesByNameIgnoreCase("Active Player iiii").get(0).addUser(x));
     }
@@ -176,7 +177,7 @@ public class Game {
      * @throws com.mafia.mafiabot.GameDoesntExistException
      */
     public void addVillagers(MessageCreateEvent e,List<User>users)throws RoleNotHighEnoughException, GameDoesntExistException{
-        if(e.getServer().get().getHighestRoleOf(e.getMessage().getUserAuthor().get()).get().getPosition() < e.getServer().get().getRolesByNameIgnoreCase("active moderator").get(0).getPosition()) throw new RoleNotHighEnoughException("You have to be the active moderator or higher to run this command.");
+        if(!e.getMessage().getUserAuthor().get().getRoles(server).contains(server.getRolesByNameIgnoreCase("active moderator").get(0)))throw new RoleNotHighEnoughException("You have to be the active moderator run this command.");
         villagers.addAll(users);
         users.forEach(x -> e.getServer().get().getRolesByNameIgnoreCase("Active Player illl").get(0).addUser(x));
     }
@@ -188,7 +189,7 @@ public class Game {
      * @throws com.mafia.mafiabot.GameDoesntExistException
      */
     public void addDetectives(MessageCreateEvent e,List<User>users)throws RoleNotHighEnoughException, GameDoesntExistException{
-        if(e.getServer().get().getHighestRoleOf(e.getMessage().getUserAuthor().get()).get().getPosition() < e.getServer().get().getRolesByNameIgnoreCase("active moderator").get(0).getPosition()) throw new RoleNotHighEnoughException("You have to be the active moderator or higher to run this command.");
+        if(!e.getMessage().getUserAuthor().get().getRoles(server).contains(server.getRolesByNameIgnoreCase("active moderator").get(0)))throw new RoleNotHighEnoughException("You have to be the active moderator run this command.");
         detectives.addAll(users);
         users.forEach(x -> e.getServer().get().getRolesByNameIgnoreCase("Active Player iiil").get(0).addUser(x));
     }
@@ -199,9 +200,12 @@ public class Game {
      * @throws com.mafia.mafiabot.GameDoesntExistException
      */
     public void startNight(MessageCreateEvent e)throws RoleNotHighEnoughException, GameDoesntExistException{
-        if(e.getServer().get().getHighestRoleOf(e.getMessage().getUserAuthor().get()).get().getPosition() < e.getServer().get().getRolesByNameIgnoreCase("active moderator").get(0).getPosition()) throw new RoleNotHighEnoughException("You have to be the active moderator or higher to run this command.");
-       
-        e.getServer().get().getRoles().forEach(x->x.updatePermissions(new PermissionsBuilder(x.getPermissions()).setState(PermissionType.VOICE_SPEAK,PermissionState.DENIED).build()));
+        if(!e.getMessage().getUserAuthor().get().getRoles(server).contains(server.getRolesByNameIgnoreCase("active moderator").get(0)))throw new RoleNotHighEnoughException("You have to be the active moderator run this command.");       
+        //e.getServer().get().getRoles().forEach(x->x.updatePermissions(new PermissionsBuilder(x.getPermissions()).setState(PermissionType.VOICE_SPEAK,PermissionState.DENIED).build()));
+        mafia.forEach(x -> x.mute(server));
+        villagers.forEach(x -> x.mute(server));
+        detectives.forEach(x -> x.mute(server));
+        doctors.forEach(x -> x.mute(server));
         locked = !doctors.isEmpty();
     }
     /**
@@ -211,8 +215,11 @@ public class Game {
      * @throws com.mafia.mafiabot.GameDoesntExistException
      */
     public void endNight(MessageCreateEvent e)throws RoleNotHighEnoughException, GameDoesntExistException{
-        if(e.getServer().get().getHighestRoleOf(e.getMessage().getUserAuthor().get()).get().getPosition() < e.getServer().get().getRolesByNameIgnoreCase("active moderator").get(0).getPosition()) throw new RoleNotHighEnoughException("You have to be the active moderator or higher to run this command.");
-        e.getServer().get().getRoles().forEach(x->x.updatePermissions(new PermissionsBuilder(x.getPermissions()).setState(PermissionType.VOICE_SPEAK,PermissionState.ALLOWED).build()));
+        if(!e.getMessage().getUserAuthor().get().getRoles(server).contains(server.getRolesByNameIgnoreCase("active moderator").get(0)))throw new RoleNotHighEnoughException("You have to be the active moderator run this command.");
+        mafia.forEach(x -> x.unmute(server));
+        villagers.forEach(x -> x.unmute(server));
+        detectives.forEach(x -> x.unmute(server));
+        doctors.forEach(x -> x.unmute(server));
         locked = false;
         saved.clear();
     }
@@ -223,7 +230,7 @@ public class Game {
      * @throws com.mafia.mafiabot.GameDoesntExistException
      */
     public void endGame(MessageCreateEvent e)throws RoleNotHighEnoughException, GameDoesntExistException{
-        if(e.getServer().get().getHighestRoleOf(e.getMessage().getUserAuthor().get()).get().getPosition() < e.getServer().get().getRolesByNameIgnoreCase("active moderator").get(0).getPosition()) throw new RoleNotHighEnoughException("You have to be the active moderator or higher to run this command.");
+        if(!e.getMessage().getUserAuthor().get().getRoles(server).contains(server.getRolesByNameIgnoreCase("active moderator").get(0)))throw new RoleNotHighEnoughException("You have to be the active moderator run this command.");
         mafia.forEach(x -> e.getServer().get().getRolesByNameIgnoreCase("Active player iill").forEach(y -> y.removeUser(x)));
         doctors.forEach(x -> e.getServer().get().getRolesByNameIgnoreCase("Active player iiii").forEach(y -> y.removeUser(x)));
         detectives.forEach(x -> e.getServer().get().getRolesByNameIgnoreCase("Active player iiil").forEach(y -> y.removeUser(x)));

@@ -30,7 +30,7 @@
         <dependency>
             <groupId>de.btobastian.Javacord</groupId>
             <artifactId>javacord</artifactId>
-            <version>22c8c32</version>
+            <version>90aa8ad</version>
             <type>pom</type>
         </dependency>
         <dependency>

@@ -98,7 +98,6 @@ public class MessageListener implements MessageCreateListener {
                             case "!endgame":
                                 game.endGame(e);
                                 break;
-
                             case "!accuse":
                                 game.accuse(e.getMessage().getMentionedUsers().get(0), e);
                                 break;
@@ -123,9 +122,7 @@ public class MessageListener implements MessageCreateListener {
      * the server.
      */
     public void startGame(MessageCreateEvent e) throws RoleNotHighEnoughException {
-        if (e.getServer().get().getHighestRoleOf(e.getMessage().getUserAuthor().get()).get().getPosition() < e.getServer().get().getRolesByNameIgnoreCase("trained moderator").get(0).getPosition()) {
-            throw new RoleNotHighEnoughException("You have to be a trained moderator or higher to run this command.");
-        }
+        if(!e.getMessage().getUserAuthor().get().getRoles(e.getServer().get()).contains(e.getServer().get().getRolesByNameIgnoreCase("active moderator").get(0)))throw new RoleNotHighEnoughException("You have to be the active moderator run this command.");
         try {
             List<User> players = new LinkedList<>();
             Message m = e.getChannel().sendMessage("@here\nNew game started by " + e.getMessage().getAuthor().getName() + ". React to join.").get();
