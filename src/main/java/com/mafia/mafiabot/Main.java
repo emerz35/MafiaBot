@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class Main {
     static String token;
     public static final Random r = new Random();
-    private DatabaseManager dbmanager = new DatabaseManager();
+    public static final DatabaseManager dbmanager = new DatabaseManager();
     /**
      * The main bot class to run, adds message create listeners
      *
@@ -30,4 +30,5 @@ public class Main {
         api.addServerLeaveListener(event -> System.out.println("Left server " + event.getServer().getName()));
         
     }
+    
 }

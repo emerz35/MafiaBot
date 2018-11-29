@@ -60,6 +60,12 @@ public class MessageListener implements MessageCreateListener {
                     case "!startgame":
                         startGame(e);
                         break;
+                    case "!addPlayer":
+                        Main.dbmanager.addPlayer(e.getMessage().getMentionedUsers().get(0));
+                        break;
+                    case "!getPlayerScore":
+                        e.getChannel().sendMessage(""+Main.dbmanager.getPlayerScore(e.getMessage().getMentionedUsers().get(0)));
+                        break;
                     default:
 
                         Game game = getGame(e.getServer().get());
