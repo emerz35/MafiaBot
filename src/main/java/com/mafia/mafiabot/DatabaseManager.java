@@ -34,6 +34,7 @@ public class DatabaseManager {
     	}catch(SQLException | ClassNotFoundException e) {
     		e.printStackTrace();
     	}
+    	
     }
     
 }

@@ -28,5 +28,6 @@ public class Main {
 
         api.addServerJoinListener(event -> System.out.println("Joined server " + event.getServer().getName()));
         api.addServerLeaveListener(event -> System.out.println("Left server " + event.getServer().getName()));
+        
     }
 }
