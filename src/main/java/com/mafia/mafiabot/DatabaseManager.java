@@ -19,7 +19,21 @@ public class DatabaseManager {
     }
     public void addPlayer(User user){
         startConnection();
+        
         endConnection();
+    }
+    public void createTable(){
+    	startConnection();
+    	try(Statement stmt = conn.createStatement()){
+	    	stmt.executeUpdate("CREATE TABLE players ("
+	    			+ "id INTEGER not NULL,"
+	    			+ "displayName VARCHAR(255),"
+	    			+ "score INTEGER not NULL,"
+	    			+ "PRIMARY KEY (id))");
+	    	endConnection();
+    	}catch(SQLException | ClassNotFoundException e) {
+    		e.printStackTrace();
+    	}
     }
     
 }

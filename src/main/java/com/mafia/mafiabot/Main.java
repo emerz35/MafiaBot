@@ -9,6 +9,7 @@ import java.util.Scanner;
 public class Main {
     static String token;
     public static final Random r = new Random();
+    private DatabaseManager dbmanager = new DatabaseManager();
     /**
      * The main bot class to run, adds message create listeners
      *
@@ -23,6 +24,7 @@ public class Main {
         System.out.println("You can invite me by using the following url: " + api.createBotInvite());
         
         api.addMessageCreateListener(new MessageListener());
+        dbmanager.createTable();
 
         api.addServerJoinListener(event -> System.out.println("Joined server " + event.getServer().getName()));
         api.addServerLeaveListener(event -> System.out.println("Left server " + event.getServer().getName()));
