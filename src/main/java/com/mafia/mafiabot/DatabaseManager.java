@@ -9,6 +9,13 @@ import org.javacord.api.entity.user.User;
 */
 public class DatabaseManager {
     private final String url = "mysql://playerdatabase:3306/";
+    public DatabaseManager(){
+        try{
+           Class.forName("com.mysql.jdbc.Driver");
+        }catch(ClassNotFoundException e){
+            e.printStackTrace();
+        }
+    }
     
     public void addPlayer(User user){
         try(Connection conn=DriverManager.getConnection(url,System.getenv("database-username"),System.getenv("database-password"))){
