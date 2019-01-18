@@ -11,7 +11,7 @@ public class DatabaseManager {
     private final String url = "mysql://playerdatabase:3306/";
     public DatabaseManager(){
         try{
-           Class.forName("com.mysql.jdbc.Driver");
+           Class.forName("com.mysql.cj.jdbc.Driver");
         }catch(ClassNotFoundException e){
             e.printStackTrace();
         }
