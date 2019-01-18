@@ -31,7 +31,7 @@ public class MessageListener implements MessageCreateListener {
     public void onMessageCreate(MessageCreateEvent e) {
         String message = e.getMessage().getContent();
         try {
-            if (!e.getMessage().getAuthor().isYourself()) {
+            if (!e.getMessage().getAuthor().isYourself()&&!e.getMessage().getContent().startsWith("!")) {
                 switch (message.split(" ")[0].toLowerCase()) {
                     case "!creator":
                         e.getChannel().sendMessage("I was made by FlyingLongSword-sama");
@@ -63,7 +63,7 @@ public class MessageListener implements MessageCreateListener {
                     case "!addplayer":
                         //Main.dbmanager.addPlayer(e.getMessage().getMentionedUsers().get(0));
                         break;
-                    case "!getplayercore":
+                    case "!getplayerscore":
                         //e.getChannel().sendMessage(""+Main.dbmanager.getPlayerScore(e.getMessage().getMentionedUsers().get(0)));
                         break;
                     default:
