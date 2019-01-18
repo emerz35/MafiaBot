@@ -31,7 +31,7 @@ public class MessageListener implements MessageCreateListener {
     public void onMessageCreate(MessageCreateEvent e) {
         String message = e.getMessage().getContent();
         try {
-            if (!e.getMessage().getAuthor().isYourself()&&!e.getMessage().getContent().startsWith("!")) {
+            if (!e.getMessage().getAuthor().isYourself()&& e.getMessage().getContent().startsWith("!")) {
                 switch (message.split(" ")[0].toLowerCase()) {
                     case "!creator":
                         e.getChannel().sendMessage("I was made by FlyingLongSword-sama");
